@@ -1,2 +1,4 @@
 venv_grade_book
 .idea
+__pycache__
+logs
