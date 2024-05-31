@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from ..models import Student
 from ..schemas import StudentCreate, StudentUpdate
@@ -12,6 +13,7 @@ class StudentRepository:
         student = db.query(Student).filter(Student.id == student_id).first()
         if not student:
             logger.error(f"Student with id {student_id} not found.")
+            raise HTTPException(status_code=404, detail=f"Student with id {student_id} not found.")
         return student
 
     @classmethod
@@ -26,7 +28,7 @@ class StudentRepository:
             db.add(db_student)
             db.commit()
             db.refresh(db_student)
-            logger.info(f"Created student with id {db_student.id}.")
+            logger.info(f"Created student with id: {db_student.id} name: {db_student.name}.")
             return db_student
         except Exception as e:
             db.rollback()
@@ -54,8 +56,8 @@ class StudentRepository:
     def delete_student(cls, db: Session, student_id: int):
         db_student = db.query(Student).filter(Student.id == student_id).first()
         if db_student is None:
-            logger.error(f"Student with id {student_id} not found.")
-            return None
+            logger.error(f"delete_student: Student with id {student_id} not found.")
+            raise HTTPException(status_code=404, detail=f"Student with id {student_id} not found.")
         try:
             db.delete(db_student)
             db.commit()

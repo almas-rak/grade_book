@@ -30,7 +30,9 @@ class ScoreRepository:
             db.add(db_score)
             db.commit()
             db.refresh(db_score)
-            logger.info(f"Created score with id {db_score.id}.")
+            logger.info(
+                f"Created score with id {db_score.id}, score: {db_score.score}, student: {student.name}, student_id: {student.id}"
+            )
             return db_score
         except Exception as e:
             db.rollback()
@@ -59,13 +61,13 @@ class ScoreRepository:
     def delete_score(cls, db: Session, score_id: int):
         db_score = db.query(Score).filter(Score.id == score_id).first()
         if db_score is None:
-            logger.error(f"Score with id {score_id} not found.")
-            return None
+            logger.error(f"def delete_score:Score with id {score_id} not found.")
+            raise HTTPException(status_code=404, detail=f"Score with id {score_id} not found.")
         try:
             db.delete(db_score)
             db.commit()
-            logger.info(f"Deleted score with id {score_id}.")
+            logger.info(f"def delete_score: Deleted score with id {score_id}.")
         except Exception as e:
             db.rollback()
-            logger.error(f"Error deleting score with id {score_id}: {e}")
+            logger.error(f"score_crud, def delete_score: Error deleting score with id {score_id}: {e}")
             raise
